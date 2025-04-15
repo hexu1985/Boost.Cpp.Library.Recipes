@@ -5,21 +5,19 @@
    Remove the POSIX shared memory object identified by 'name'
 */
 #include <iostream>
-#include <fmt/ranges.h>
+#include <boost/interprocess/shared_memory_object.hpp>
 
-using fmt::format;
+using namespace boost::interprocess;
 
 int
 main(int argc, char *argv[])
 {
     if (argc != 2 || strcmp(argv[1], "--help") == 0) {
-        std::cerr << format("{} shm-name\n", argv[0]);
+        std::cerr << "Usage: " << argv[0] << "shm-name\n";
         exit(1);
     }
 
-#if 0
-    if (shm_unlink(argv[1]) == -1)
-        errExit("shm_unlink");
-    exit(EXIT_SUCCESS);
-#endif
+    shared_memory_object::remove(argv[1]);
+
+    return 0;
 }
