@@ -1,0 +1,22 @@
+cmake_minimum_required( VERSION 3.15 )
+
+project(pshm LANGUAGES C)
+
+message( STATUS "CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}" )
+message( STATUS "PROJECT_SOURCE_DIR = ${PROJECT_SOURCE_DIR}" )
+
+add_subdirectory(lib)
+
+#add_executable(pshm_create pshm_create.c)
+#target_include_directories(pshm_create PRIVATE lib)
+#target_link_libraries(pshm_create tlpi)
+
+file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
+
+FOREACH (src_file ${SOURCES})
+    get_filename_component(exe_file ${src_file} NAME_WLE)
+    add_executable(${exe_file} ${src_file})
+    target_include_directories(${exe_file} PRIVATE lib)
+    target_link_libraries(${exe_file} tlpi)
+ENDFOREACH()
+
