@@ -22,11 +22,11 @@ file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
 file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
 add_library(tlpi 
-    STATIC 
+    OBJECT 
     ${SOURCES}
     ${HEADERS}
     )
 
-target_include_directories(tlpi PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(tlpi PUBLIC . PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 add_dependencies(tlpi GenerateEnameFile)

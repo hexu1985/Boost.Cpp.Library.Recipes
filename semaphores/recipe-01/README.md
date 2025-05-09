@@ -1,4 +1,4 @@
-### 信号量
+### 信号量API
 
 - [POSIX API示例](posix)
 - [Boost API示例](boost)
