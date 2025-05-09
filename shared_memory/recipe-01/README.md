@@ -1,4 +1,4 @@
-### 共享内存对象
+### 共享内存对象API
 
 - [POSIX API示例](posix)
 - [Boost API示例](boost)
