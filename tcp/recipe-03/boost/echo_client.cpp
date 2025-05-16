@@ -2,9 +2,10 @@
 #include <cstdio>
 #include <iostream>
 #include <string>
-#include <system_error>
 
-#include <asio.hpp>
+#include <boost/asio.hpp>
+
+using namespace boost;
 
 int main(int argc, char* argv[])
 {
@@ -33,16 +34,29 @@ int main(int argc, char* argv[])
 
         // Step 4. Connecting a socket.
         sock.connect(ep);
+        std::cout << "Connected..........." << std::endl;
 
-        const int MESSAGE_SIZE = 30;
-        char message[MESSAGE_SIZE];
-		int str_len = sock.read_some(asio::buffer(message, MESSAGE_SIZE));
-        std::cout << "Message from server: " << std::string_view(message, str_len) << std::endl;
+        std::string message;
+        const int BUF_SIZE = 1024;
+        char buf[BUF_SIZE];
+        int str_len = 0;
+        while (true) {
+            std::cout << "Input message(Q to quit): ";
+            std::getline(std::cin, message);
+
+            if (message.length() ==1 && (message[0] == 'q' || message[0] == 'Q')) {
+                break;
+            }
+
+            asio::write(sock, asio::buffer(message));
+            str_len = sock.read_some(asio::buffer(buf, BUF_SIZE));
+            std::cout << "Message from server: " << std::string_view(buf, str_len) << std::endl;
+        }
     }
     // Overloads of asio::ip::address::from_string() and 
     // asio::ip::tcp::socket::connect() used here throw
     // exceptions in case of error condition.
-    catch (std::system_error &e) {
+    catch (system::system_error &e) {
         std::cout << "Error occured! Error code = " << e.code()
             << ". Message: " << e.what();
 

@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
         // Step 4. Connecting a socket.
         sock.connect(ep);
 
-        const unsigned char MESSAGE_SIZE = 30;
+        const int MESSAGE_SIZE = 30;
         char message[MESSAGE_SIZE];
 		int str_len = sock.read_some(asio::buffer(message, MESSAGE_SIZE));
         std::cout << "Message from server: " << std::string_view(message, str_len) << std::endl;

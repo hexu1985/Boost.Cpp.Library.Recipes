@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
         // Step 4. Connecting a socket.
         sock.connect(ep);
 
-        const unsigned char MESSAGE_SIZE = 30;
+        const int MESSAGE_SIZE = 30;
         char message[MESSAGE_SIZE];
         int str_len=0;
         int idx=0, read_len=0;
