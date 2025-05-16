@@ -36,8 +36,17 @@ int main(int argc, char* argv[])
 
         const unsigned char MESSAGE_SIZE = 30;
         char message[MESSAGE_SIZE];
-		int str_len = sock.read_some(asio::buffer(message, MESSAGE_SIZE));
+        int str_len=0;
+        int idx=0, read_len=0;
+        std::error_code ec;
+        while (read_len=sock.read_some(asio::buffer(&message[idx++], 1), ec)) {
+            if (ec) {
+                throw std::system_error(ec, "read() error!");
+            }
+            str_len+=read_len;
+        }
         std::cout << "Message from server: " << std::string_view(message, str_len) << std::endl;
+        std::cout << "Function read call count: " << str_len << std::endl;
     }
     // Overloads of asio::ip::address::from_string() and 
     // asio::ip::tcp::socket::connect() used here throw

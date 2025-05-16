@@ -2,9 +2,10 @@
 #include <cstdio>
 #include <iostream>
 #include <string>
-#include <system_error>
 
-#include <asio.hpp>
+#include <boost/asio.hpp>
+
+using namespace boost;
 
 int main(int argc, char* argv[])
 {
@@ -55,7 +56,7 @@ int main(int argc, char* argv[])
 
         asio::write(sock, asio::buffer(message));
 	}
-	catch (std::system_error &e) {
+	catch (system::system_error &e) {
 		std::cout << "Error occured! Error code = " << e.code()
 			<< ". Message: " << e.what();
 
