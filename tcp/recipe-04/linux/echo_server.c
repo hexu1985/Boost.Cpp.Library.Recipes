@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 	char message[BUF_SIZE];
 	int str_len, i;
 	
-	struct sockaddr_in serv_adr;
+	struct sockaddr_in serv_addr;
 	struct sockaddr_in clnt_addr;
 	socklen_t clnt_addr_sz;
 	
@@ -33,12 +33,12 @@ int main(int argc, char *argv[])
         error_handling("setsockopt() error");
     }
 	
-	memset(&serv_adr, 0, sizeof(serv_adr));
-	serv_adr.sin_family=AF_INET;
-	serv_adr.sin_addr.s_addr=htonl(INADDR_ANY);
-	serv_adr.sin_port=htons(atoi(argv[1]));
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	serv_addr.sin_family=AF_INET;
+	serv_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+	serv_addr.sin_port=htons(atoi(argv[1]));
 
-	if(bind(serv_sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr))==-1)
+	if(bind(serv_sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr))==-1)
 		error_handling("bind() error");
 	
 	if(listen(serv_sock, 5)==-1)

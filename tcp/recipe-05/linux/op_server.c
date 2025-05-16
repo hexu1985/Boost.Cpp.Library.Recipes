@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
 	char opinfo[BUF_SIZE];
 	int result, opnd_cnt, i;
 	int recv_cnt, recv_len;	
-	struct sockaddr_in serv_adr, clnt_adr;
-	socklen_t clnt_adr_sz;
+	struct sockaddr_in serv_addr, clnt_addr;
+	socklen_t clnt_addr_sz;
     const int on = 1;
 
 	if(argc!=2) {
@@ -33,21 +33,21 @@ int main(int argc, char *argv[])
         error_handling("setsockopt() error");
     }
 	
-	memset(&serv_adr, 0, sizeof(serv_adr));
-	serv_adr.sin_family=AF_INET;
-	serv_adr.sin_addr.s_addr=htonl(INADDR_ANY);
-	serv_adr.sin_port=htons(atoi(argv[1]));
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	serv_addr.sin_family=AF_INET;
+	serv_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+	serv_addr.sin_port=htons(atoi(argv[1]));
 
-	if(bind(serv_sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr))==-1)
+	if(bind(serv_sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr))==-1)
 		error_handling("bind() error");
 	if(listen(serv_sock, 5)==-1)
 		error_handling("listen() error");	
-	clnt_adr_sz=sizeof(clnt_adr);
+	clnt_addr_sz=sizeof(clnt_addr);
 
 	for(i=0; i<5; i++)
 	{
 		opnd_cnt=0;
-		clnt_sock=accept(serv_sock, (struct sockaddr*)&clnt_adr, &clnt_adr_sz);	
+		clnt_sock=accept(serv_sock, (struct sockaddr*)&clnt_addr, &clnt_addr_sz);	
 		read(clnt_sock, &opnd_cnt, 1);
 		
 		recv_len=0;
