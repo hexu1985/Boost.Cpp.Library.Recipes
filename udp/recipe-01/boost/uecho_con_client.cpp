@@ -23,14 +23,14 @@ int main(int argc, char* argv[])
     try {
         // Step 2. Creating an endpoint designating 
         // a target server application.
-        asio::ip::tcp::endpoint
+        asio::ip::udp::endpoint
             ep(asio::ip::address::from_string(raw_ip_address),
                     port_num);
 
         asio::io_context io;
 
         // Step 3. Creating and opening a socket.
-        asio::ip::tcp::socket sock(io, ep.protocol());
+        asio::ip::udp::socket sock(io, ep.protocol());
 
         // Step 4. Connecting a socket.
         sock.connect(ep);
@@ -48,13 +48,13 @@ int main(int argc, char* argv[])
                 break;
             }
 
-            asio::write(sock, asio::buffer(message));
-            str_len = asio::read(sock, asio::buffer(buf, message.length()));
+            sock.send(asio::buffer(message));
+            str_len = sock.receive(asio::buffer(buf, BUF_SIZE));
             std::cout << "Message from server: " << std::string_view(buf, str_len) << std::endl;
         }
     }
     // Overloads of asio::ip::address::from_string() and 
-    // asio::ip::tcp::socket::connect() used here throw
+    // asio::ip::udp::socket::connect() used here throw
     // exceptions in case of error condition.
     catch (system::system_error &e) {
         std::cout << "Error occured! Error code = " << e.code()
