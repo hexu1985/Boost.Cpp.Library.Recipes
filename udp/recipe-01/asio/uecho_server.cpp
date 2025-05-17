@@ -2,9 +2,7 @@
 #include <cstdio>
 #include <iostream>
 
-#include <boost/asio.hpp>
-
-using namespace boost;
+#include <asio.hpp>
 
 int main(int argc, char* argv[])
 {
@@ -27,7 +25,7 @@ int main(int argc, char* argv[])
 	// Step 3. Creating and opening a socket.
 	asio::ip::udp::socket sock(io, ep.protocol());
 
-	system::error_code ec;
+	std::error_code ec;
 
 	// Step 4. Binding the socket to an endpoint.
 	sock.bind(ep, ec);
