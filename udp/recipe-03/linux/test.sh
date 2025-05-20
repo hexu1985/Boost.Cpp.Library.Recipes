@@ -2,13 +2,15 @@
 
 cd $(dirname ${BASH_SOURCE[0]})
 
-./bound_host1 9999 &
+sudo route add -host 224.1.1.2 dev wlp0s20f3
+
+./news_receiver 224.1.1.2 9999 &
 SERVER_PID=$!
 
 sleep 1
 
-./bound_host2 127.0.0.1 9999
+./news_sender 224.1.1.2 9999
 
-wait ${SERVER_PID}
+kill -9 ${SERVER_PID}
 
 echo ""

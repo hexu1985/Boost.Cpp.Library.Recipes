@@ -1,11 +1,11 @@
 cmake_minimum_required( VERSION 3.15 )
 
-project(bound_host LANGUAGES C)
+project(udp_mcast LANGUAGES C)
 
 message( STATUS "CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}" )
 message( STATUS "PROJECT_SOURCE_DIR = ${PROJECT_SOURCE_DIR}" )
 
-set(TEST_SCRIPTS test.sh)
+set(TEST_SCRIPTS test.sh news.txt)
 
 foreach(script ${TEST_SCRIPTS})
     add_custom_command(
@@ -21,6 +21,7 @@ endforeach()
 
 add_custom_target(copy_scripts ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test.sh
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/news.txt
 )
 
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
