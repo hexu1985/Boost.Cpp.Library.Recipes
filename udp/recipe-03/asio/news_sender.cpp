@@ -7,9 +7,7 @@
 #include <thread>
 #include <chrono>
 
-#include <boost/asio.hpp>
-
-using namespace boost;
+#include <asio.hpp>
 
 int main(int argc, char* argv[])
 {
@@ -52,7 +50,7 @@ int main(int argc, char* argv[])
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
-    catch (system::system_error &e) {
+    catch (std::system_error &e) {
         std::cout << "Error occured! Error code = " << e.code()
             << ". Message: " << e.what();
 
