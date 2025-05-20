@@ -31,8 +31,6 @@ int main(int argc, char* argv[])
         // Step 3. Creating and opening a socket.
         asio::ip::udp::socket sock(io, ep.protocol());
 
-        asio::ip::udp::endpoint remote_endpoint;
-
         std::string_view msg1 = "Hi!";
         std::string_view msg2 = "I'm another UDP host!";
         std::string_view msg3 = "Nice to meet you";

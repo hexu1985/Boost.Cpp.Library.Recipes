@@ -3,6 +3,9 @@
 #include <iostream>
 #include <string>
 #include <string_view>
+#include <fstream>
+#include <thread>
+#include <chrono>
 
 #include <boost/asio.hpp>
 
@@ -33,12 +36,21 @@ int main(int argc, char* argv[])
         // Step 3. Creating and opening a socket.
         asio::ip::udp::socket sock(io, ep.protocol());
 
-        std::string_view msg1 = "Hi!";
-        std::string_view msg2 = "I'm another UDP host!";
-        std::string_view msg3 = "Nice to meet you";
-        sock.send_to(asio::buffer(msg1), ep);
-        sock.send_to(asio::buffer(msg2), ep);
-        sock.send_to(asio::buffer(msg3), ep);
+        const int TTL=64;
+        sock.set_option(boost::asio::ip::multicast::hops(TTL));
+
+        std::ifstream ifile("news.txt");
+        if (!ifile) {
+            std::cout << "open news.txt failed" << std::endl;
+            return -1;
+        }
+
+        std::string buf;
+        while (std::getline(ifile, buf)) {
+            buf += '\n';
+            sock.send_to(asio::buffer(buf),ep);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
     }
     catch (system::system_error &e) {
         std::cout << "Error occured! Error code = " << e.code()
