@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
         fgets(buf, BUF_SIZE, fp);
         sendto(send_sock, buf, strlen(buf), 
                 0, (struct sockaddr*)&remote_addr, sizeof(remote_addr));
-        sleep(2);
+        sleep(1);
     }
 
     close(send_sock);

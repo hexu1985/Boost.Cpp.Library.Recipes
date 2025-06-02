@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
             break;
         buf[str_len]=0;
         fputs(buf, stdout);
+        fflush(stdout);
     }
 
     close(recv_sock);
