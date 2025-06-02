@@ -5,20 +5,19 @@
 #include <chrono>
 #include <string_view>
 
-#include <boost/asio.hpp>
-
-using namespace boost;
+#include <asio.hpp>
 
 int main(int argc, char* argv[])
 {
-	if(argc!=2) {
-		printf("Usage : %s <port>\n", argv[0]);
+	if(argc!=3) {
+		printf("Usage : %s <GroupIP> <PORT>\n", argv[0]);
 		exit(1);
 	 }
 
 	// Step 1. Here we assume that the server application has
 	// already obtained the protocol port number.
-	unsigned short port_num = std::stoi(argv[1]);
+    std::string multicast_ip_address = argv[1];
+    unsigned short port_num = std::stoi(argv[2]);
 
 	// Step 2. Creating an endpoint.
 	asio::ip::udp::endpoint ep(asio::ip::address_v4::any(),
@@ -30,7 +29,7 @@ int main(int argc, char* argv[])
 	// Step 3. Creating and opening a socket.
 	asio::ip::udp::socket sock(io, ep.protocol());
 
-	system::error_code ec;
+	std::error_code ec;
 
 	// Step 4. Binding the socket to an endpoint.
 	sock.bind(ep, ec);
@@ -44,6 +43,12 @@ int main(int argc, char* argv[])
 
 		return ec.value();
 	}
+
+    // Step 5. Joining the group of multicast.
+    sock.set_option(
+            asio::ip::multicast::join_group(
+                asio::ip::address::from_string(
+                    multicast_ip_address)));
 
     const int BUF_SIZE = 1024;
 	char buf[BUF_SIZE];

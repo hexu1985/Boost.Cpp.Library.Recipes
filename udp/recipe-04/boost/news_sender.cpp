@@ -7,12 +7,14 @@
 #include <thread>
 #include <chrono>
 
-#include <asio.hpp>
+#include <boost/asio.hpp>
+
+using namespace boost;
 
 int main(int argc, char* argv[])
 {
     if(argc!=3){
-        printf("Usage : %s <Broadcast IP> <port>\n", argv[0]);
+        printf("Usage : %s <IP> <port>\n", argv[0]);
         exit(1);
     }
 
@@ -34,6 +36,9 @@ int main(int argc, char* argv[])
         // Step 3. Creating and opening a socket.
         asio::ip::udp::socket sock(io, ep.protocol());
 
+        const int TTL=64;
+        sock.set_option(asio::ip::multicast::hops(TTL));
+
         std::ifstream ifile("news.txt");
         if (!ifile) {
             std::cout << "open news.txt failed" << std::endl;
@@ -47,7 +52,7 @@ int main(int argc, char* argv[])
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
-    catch (std::system_error &e) {
+    catch (system::system_error &e) {
         std::cout << "Error occured! Error code = " << e.code()
             << ". Message: " << e.what();
 
