@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-#define BUF_SIZE 30
+#define BUF_SIZE 1024
 void error_handling(char *message);
 
 int main(int argc, char *argv[])
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	int so_brd=1;
 	
 	if(argc!=3) {
-		printf("Usage : %s <Boradcast IP> <PORT>\n", argv[0]);
+		printf("Usage : %s <Broadcast IP> <PORT>\n", argv[0]);
 		exit(1);
 	}
   
