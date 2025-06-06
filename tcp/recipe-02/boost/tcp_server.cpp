@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 		// Step 3. Instantiating and opening an acceptor socket.
 		asio::ip::tcp::acceptor acceptor(io, ep.protocol());
 
-        acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+        acceptor.set_option(asio::socket_base::reuse_address(true));
 
 		// Step 4. Binding the acceptor socket to the 
 		// server endpint.
