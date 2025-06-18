@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -g3 -Wall -Wextra #-std=c++17
+CXXFLAGS = -g3 -Wall -Wextra -I${HOME}/local/boost/include #-std=c++17
 LDFLAGS = 
 LDLIBS = #-lboost_thread -lboost_system -lpthread -lrt
 
