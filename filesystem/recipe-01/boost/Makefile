@@ -1,7 +1,7 @@
 CXX = g++
-CXXFLAGS = -Wall -std=c++11 
-LDFLAGS = 
-LDLIBS = -lboost_filesystem -lboost_system
+CXXFLAGS = -Wall -std=c++11 -I${HOME}/local/boost/include
+LDFLAGS = -L${HOME}/local/boost/lib
+LDLIBS = -lboost_filesystem
 
 SOURCES = $(shell ls *.cpp)
 PROGRAMS = $(patsubst %.cpp,%,$(SOURCES))
