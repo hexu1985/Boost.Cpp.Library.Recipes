@@ -1,7 +1,7 @@
 CXX = g++
-CXXFLAGS = -g -Wall -std=c++11 -DBOOST_STACKTRACE_LINK
-LDFLAGS = 
-LDLIBS = -lboost_stacktrace_backtrace -ldl
+CXXFLAGS = -g -Wall -std=c++11 -DBOOST_STACKTRACE_LINK -I${HOME}/local/boost/include 
+LDFLAGS = -L${HOME}/local/boost/lib
+LDLIBS = -lboost_stacktrace_backtrace -ldl -lbacktrace -ldl
 
 SOURCES = $(shell ls *.cpp)
 PROGRAMS = $(patsubst %.cpp,%,$(SOURCES))
