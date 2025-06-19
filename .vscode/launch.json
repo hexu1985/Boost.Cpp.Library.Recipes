@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/home/hexu/git/Boost.Cpp.Library.Recipes/filesystem/recipe-01/boost/build/printdir",
+            "program": "/home/hexu/git/Boost.Cpp.Library.Recipes/shared_memory/recipe-02/boost/build/shmem",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
