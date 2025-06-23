@@ -11,6 +11,9 @@
 ### [共享内存](shared_memory)
 - [共享内存对象API](shared_memory/recipe-01)
 
+### [侵入式引用计数指针](intrusive_ptr)
+- [使用自由函数](intrusive_ptr/recipe-01)
+
 ### [定时器](timer)
 - [定时器对象API](timer/recipe-01)
 
