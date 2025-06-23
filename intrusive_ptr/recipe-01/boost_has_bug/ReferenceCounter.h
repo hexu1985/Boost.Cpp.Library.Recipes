@@ -8,12 +8,31 @@
 class ReferenceCounter
 {
 public:
+    friend void intrusive_ptr_add_ref(ReferenceCounter *p)
+    {
+        std::cout << "Call intrusive_ptr_add_ref" << std::endl;
+        assert(p);
+        assert(p->ref_count >= 0);
+        ++p->ref_count;
+    }
+
+    friend void intrusive_ptr_release(ReferenceCounter *p)
+    {
+        std::cout << "Call intrusive_ptr_release" << std::endl;
+        assert(p);
+        assert(p->ref_count > 0);
+        if (--p->ref_count == 0)
+        {
+            delete p;
+        }
+    }
+
     ReferenceCounter() :ref_count(0)
     {
         std::cout << "Reference Counter Constructor" << std::endl;
     }
 
-    ReferenceCounter(const ReferenceCounter &other): ref_count(0)
+    ReferenceCounter(const ReferenceCounter  &other)
     {
         std::cout << "Reference Counter Copy Constructor" << std::endl;
     }
@@ -34,37 +53,8 @@ public:
         return ref_count;
     }
 
-    void AddRef()
-    {
-        ++ref_count;
-    }
-
-    void ReleaseRef()
-    {
-        if (--ref_count == 0)
-        {
-            delete this;
-        }
-    }
-
 private:
     std::atomic_int ref_count;
 };
-
-static inline void intrusive_ptr_add_ref(ReferenceCounter *p)
-{
-    std::cout << "Call intrusive_ptr_add_ref" << std::endl;
-    assert(p);
-    assert(p->RefCount() >= 0);
-    p->AddRef();
-}
-
-static inline void intrusive_ptr_release(ReferenceCounter *p)
-{
-    std::cout << "Call intrusive_ptr_release" << std::endl;
-    assert(p);
-    assert(p->RefCount() > 0);
-    p->ReleaseRef();
-}
 
 #endif
