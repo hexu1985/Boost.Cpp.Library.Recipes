@@ -13,6 +13,7 @@
 
 ### [侵入式引用计数指针](intrusive_ptr)
 - [使用自由函数](intrusive_ptr/recipe-01)
+- [从boost::intrusive_ref_counter继承](intrusive_ptr/recipe-02)
 
 ### [定时器](timer)
 - [定时器对象API](timer/recipe-01)
