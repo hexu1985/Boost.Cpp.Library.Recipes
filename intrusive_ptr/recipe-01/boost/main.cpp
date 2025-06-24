@@ -26,9 +26,9 @@ int main()
     std::cout << "******************" << std::endl;
 
     {
-        ptr->AddRef();
         boost::intrusive_ptr<ProcessData> ptrWeak(ptr.get(), false);
         std::cout << "ref_count after construct weak_ptr = " << ptrWeak->RefCount() << std::endl;
+        ptrWeak.detach();
     }
 
     std::cout << "******************" << std::endl;
