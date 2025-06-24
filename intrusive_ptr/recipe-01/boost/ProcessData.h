@@ -2,8 +2,8 @@
 #define PROCESS_DATA_H
 
 #include "ReferenceCounter.h"
-#include<string>
-#include<iostream>
+#include <string>
+#include <iostream>
 
 class ProcessData : public ReferenceCounter
 {
