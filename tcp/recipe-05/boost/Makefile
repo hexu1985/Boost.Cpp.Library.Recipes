@@ -1,7 +1,7 @@
 CXX = g++
-CXXFLAGS = -Wall -std=c++17
-LDFLAGS = 
-LDLIBS = -lboost_system
+CXXFLAGS = -Wall -std=c++17 -I${HOME}/local/boost/include
+LDFLAGS = -L${HOME}/local/boost/lib
+LDLIBS = #-lboost_system
 
 SOURCES = $(shell ls *.cpp)
 PROGRAMS = $(patsubst %.cpp,%,$(SOURCES))
@@ -17,5 +17,5 @@ $(PROGRAMS): %: %.o
 
 .PHONY: clean
 clean:
-	rm -f *.o $(PROGRAMS) receive.dat
+	rm -f *.o $(PROGRAMS)
 
