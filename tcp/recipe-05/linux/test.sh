@@ -2,19 +2,15 @@
 
 cd $(dirname ${BASH_SOURCE[0]})
 
-./op_server 9999 &
+./file_server 9999 &
+SERVER_PID=$!
 
+sleep 1
 
-for i in $(seq 1 6)
-do
-    sleep 1
-    ./op_client 127.0.0.1 9999 <<EOF
-3 
-12 
-24 
-36
-+
-EOF
-done
+./file_client 127.0.0.1 9999
+
+wait ${SERVER_PID}
+
+head receive.dat
 
 echo ""

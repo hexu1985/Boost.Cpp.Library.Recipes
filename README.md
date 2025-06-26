@@ -22,10 +22,9 @@
 - [TCP hello world示例](tcp/recipe-01)
 - [TCP client server示例](tcp/recipe-02)
 - [TCP echo client server示例](tcp/recipe-03)
-- [TCP echo client server示例2](tcp/recipe-04)
-- [TCP op client server示例](tcp/recipe-05)
-- [基于TCP的半关闭示例](tcp/recipe-06)
-- [IP地址和域名之间的转换示例](tcp/recipe-07)
+- [TCP op client server示例](tcp/recipe-04)
+- [基于TCP的半关闭示例](tcp/recipe-05)
+- [IP地址和域名之间的转换示例](tcp/recipe-06)
 
 ### [UDP](udp)
 - [UDP echo client server示例](udp/recipe-01)

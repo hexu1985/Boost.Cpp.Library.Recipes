@@ -1,11 +1,11 @@
 cmake_minimum_required( VERSION 3.15 )
 
-project(tcp_shutdown LANGUAGES C)
+project(tcp_op LANGUAGES C)
 
 message( STATUS "CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}" )
 message( STATUS "PROJECT_SOURCE_DIR = ${PROJECT_SOURCE_DIR}" )
 
-set(TEST_SCRIPTS test.sh file_server.c)
+set(TEST_SCRIPTS test.sh)
 
 foreach(script ${TEST_SCRIPTS})
     add_custom_command(
@@ -21,7 +21,6 @@ endforeach()
 
 add_custom_target(copy_scripts ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test.sh
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/file_server.c
 )
 
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.c)

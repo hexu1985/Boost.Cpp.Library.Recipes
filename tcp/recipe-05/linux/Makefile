@@ -15,5 +15,5 @@ $(PROGRAMS): %: %.o
 
 .PHONY: clean
 clean:
-	rm -f *.o $(PROGRAMS)
+	rm -f *.o $(PROGRAMS) receive.dat
 
