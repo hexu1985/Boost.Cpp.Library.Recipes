@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
         // Step 2. Creating an endpoint designating 
         // a target server application.
         asio::ip::udp::endpoint
-            ep(asio::ip::address::from_string(raw_ip_address),
+            ep(asio::ip::make_address(raw_ip_address),
                     port_num);
 
         asio::io_context io;
