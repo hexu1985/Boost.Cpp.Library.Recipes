@@ -1,7 +1,6 @@
 #include <iostream>
 #include <chrono>
 #include <string>
-#include <thread>
 #include <boost/asio.hpp>
 
 #include "print_message.hpp"
