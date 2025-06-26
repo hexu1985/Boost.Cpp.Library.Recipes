@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
             std::cout << "Message from server: " << std::string_view(buf, str_len) << std::endl;
         }
     }
-    // Overloads of asio::ip::address::from_string() and 
+    // Overloads of asio::ip::make_address() and 
     // asio::ip::udp::socket::connect() used here throw
     // exceptions in case of error condition.
     catch (system::system_error &e) {

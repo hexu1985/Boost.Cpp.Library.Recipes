@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     // Step 5. Joining the group of multicast.
     sock.set_option(
             asio::ip::multicast::join_group(
-                asio::ip::address::from_string(
+                asio::ip::make_address(
                     multicast_ip_address)));
 
     const int BUF_SIZE = 1024;
