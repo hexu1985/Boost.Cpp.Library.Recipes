@@ -23,20 +23,15 @@ int main(int argc, char* argv[])
 	// Step 2.
 	asio::io_context io;
 
-	// Step 3. Creating a query.
-	asio::ip::tcp::resolver::query resolver_query(host,
-		port_num, 
-        asio::ip::tcp::resolver::query::numeric_service);
-
-	// Step 5. Creating a resolver.
+	// Step 3. Creating a resolver.
 	asio::ip::tcp::resolver resolver(io);
 
 	// Used to store information about error that happens
 	// during the resolution process.
 	std::error_code ec;
 
-	// Step 6.
-    auto results = resolver.resolve(resolver_query, ec);
+	// Step 4.
+    auto results = resolver.resolve(host, port_num, ec);
 
 	// Handling errors if any.
 	if (ec.value() != 0) {
