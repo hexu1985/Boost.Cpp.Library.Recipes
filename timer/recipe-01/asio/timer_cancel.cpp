@@ -36,6 +36,7 @@ int main() {
     } else {
         print_message("定时器将继续运行");
     }
+    timer.async_wait(task);
 
     io_thread.join();
     
