@@ -24,7 +24,7 @@ struct Alarm {
     StateCode state{kInactive};
     std::mutex mutex;
     time_point time{};
-    std::function<void()> callback;
+    std::function<void(const std::error_code&)> callback;
 
     Alarm(AlarmService* service_=nullptr);
 
@@ -33,7 +33,7 @@ struct Alarm {
 
     void cancel();
     void wait();
-    void async_wait(std::function<void()> callback_);
+    void async_wait(std::function<void(const std::error_code&)> callback_);
     void update_time(const time_point& expiry_time);
 };
 

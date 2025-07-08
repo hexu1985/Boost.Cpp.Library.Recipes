@@ -3,6 +3,7 @@
 #include <memory>
 #include <chrono>
 #include <functional>
+#include <system_error>
 
 class Alarm;
 
@@ -35,7 +36,7 @@ public:
     time_point expiry() const;
 
     // Start an asynchronous wait on the timer.
-    void async_wait(std::function<void()> callback);
+    void async_wait(std::function<void(const std::error_code&)> callback);
 
     // Perform a blocking wait on the timer. 
     void wait();

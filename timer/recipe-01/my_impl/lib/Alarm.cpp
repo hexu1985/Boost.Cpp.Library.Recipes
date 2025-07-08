@@ -19,11 +19,14 @@ void Alarm::on_expired() {
         state = kExpired;
     }
     if (callback) {
-        callback();
+        callback(make_error_code(TimerErrc::success));
     }
 }
 
 void Alarm::on_cancelled() {
+    if (callback) {
+        callback(make_error_code(TimerErrc::operation_aborted));
+    }
 }
 
 void Alarm::cancel() {
@@ -48,7 +51,7 @@ void Alarm::wait() {
     std::this_thread::sleep_until(expiry_time);
 }
 
-void Alarm::async_wait(std::function<void()> callback_) {
+void Alarm::async_wait(std::function<void(const std::error_code&)> callback_) {
     std::lock_guard<std::mutex> lck{mutex};
     if (state == kPending) {
         service->remove_alarm(this);

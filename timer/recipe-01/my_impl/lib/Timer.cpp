@@ -19,7 +19,7 @@ Timer::Timer(const duration& expiry_time):
 Timer::~Timer() {
 }
 
-void Timer::async_wait(std::function<void()> callback) {
+void Timer::async_wait(std::function<void(const std::error_code&)> callback) {
     return alarm_ptr_->async_wait(std::move(callback));
 }
 
