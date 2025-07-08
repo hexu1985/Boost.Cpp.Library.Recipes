@@ -11,8 +11,11 @@ message( STATUS "PROJECT_SOURCE_DIR = ${PROJECT_SOURCE_DIR}" )
 
 add_subdirectory(lib)
 
-add_executable(timer_wait timer_wait.cpp)
-target_link_libraries(timer_wait timer)
+file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-add_executable(timer_once1 timer_once1.cpp)
-target_link_libraries(timer_once1 timer)
+FOREACH (src_file ${SOURCES})
+    get_filename_component(exe_file ${src_file} NAME_WLE)
+    add_executable(${exe_file} ${src_file})
+    target_link_libraries(${exe_file} timer)
+ENDFOREACH()
+

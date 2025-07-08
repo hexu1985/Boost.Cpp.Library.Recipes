@@ -4,6 +4,7 @@
 #include <chrono>
 #include <functional>
 #include <system_error>
+#include "TimerError.hpp"
 
 class Alarm;
 

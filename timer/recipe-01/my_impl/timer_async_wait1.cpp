@@ -5,15 +5,12 @@
 
 #include "print_message.hpp"
 
-void hello(/*const std::error_code& ec*/) {
-    print_message("任务执行了");
-#if 0
+void hello(const std::error_code& ec) {
     if (!ec) {
         print_message("任务执行了");
-    } else if (ec == asio::error::operation_aborted) {
+    } else if (ec == TimerErrc::operation_aborted) {
         print_message("任务取消了");
     }
-#endif
 }
 
 int main() {
