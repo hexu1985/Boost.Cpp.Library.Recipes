@@ -7,14 +7,12 @@
 */
 #include <thread>
 #include <iostream>
-#include <boost/interprocess/sync/interprocess_semaphore.hpp>
-
-using namespace boost::interprocess;
+#include "Semaphore.hpp"
 
 static int glob = 0;
 
 /* Initialize a semaphore with the value 1 */
-static interprocess_semaphore sem{1};
+static Semaphore sem{1};
 
 static void                   /* Loop 'arg' times incrementing 'glob' */
 threadFunc(int loops)

@@ -1,20 +1,16 @@
-/* thread_incr_psem.cpp
+/* thread_incr.cpp
 
-   Use a POSIX unnamed semaphore to synchronize access by two threads to
-   a global variable.
+   This program employs two POSIX threads that increment the same global
+   variable, without using any synchronization method. As a consequence,
+   updates are sometimes lost.
 
-   See also thread_incr.c and thread_incr_mutex.c.
+   See also thread_incr_mutex.c.
 */
 #include <thread>
 #include <iostream>
-#include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
-using namespace boost::interprocess;
-
-static int glob = 0;
-
-/* Initialize a semaphore with the value 1 */
-static interprocess_semaphore sem{1};
+static volatile int glob = 0;   /* "volatile" prevents compiler optimizations
+                                   of arithmetic operations on 'glob' */
 
 static void                   /* Loop 'arg' times incrementing 'glob' */
 threadFunc(int loops)
@@ -22,13 +18,9 @@ threadFunc(int loops)
     int loc, j;
 
     for (j = 0; j < loops; j++) {
-        sem.wait();
-
         loc = glob;
         loc++;
         glob = loc;
-
-        sem.post();
     }
 }
 
@@ -40,12 +32,8 @@ main(int argc, char *argv[])
 
     loops = (argc > 1) ? std::stoi(argv[1]) : 10000000;
 
-    /* Create two threads that increment 'glob' */
-
     t1 = std::thread(threadFunc, loops);
     t2 = std::thread(threadFunc, loops);
-
-    /* Wait for threads to terminate */
 
     t1.join();
     t2.join();
