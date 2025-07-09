@@ -2,26 +2,21 @@
 #include <chrono>
 #include <thread>
 #include <cctype>
-#include <asio.hpp>
+#include "Timer.hpp"
 
 #include "print_message.hpp"
 
 void task(const std::error_code& ec) {
     if (!ec) {
         print_message("任务执行了");
-    } else if (ec == asio::error::operation_aborted) {
+    } else if (ec == TimerErrc::operation_aborted) {
         print_message("任务取消了");
     }
 }
 
 int main() {
-    asio::io_context io;
-    
-    asio::system_timer timer(io, std::chrono::seconds(10));
+    Timer timer(std::chrono::seconds(10));
     timer.async_wait(task);
-
-    // start io_context
-    std::thread io_thread([&io]() { io.run(); });
 
     print_message("定时器已启动，你有5秒时间决定是否取消");
     std::this_thread::sleep_for(std::chrono::seconds(5));  // 等待5秒
@@ -37,7 +32,7 @@ int main() {
         print_message("定时器将继续运行");
     }
 
-    io_thread.join();
+    std::this_thread::sleep_for(std::chrono::seconds(10));
     
     return 0;
 }

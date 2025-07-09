@@ -7,7 +7,6 @@
 #include <iostream>
 
 Alarm::Alarm(AlarmService* service): service(service) {
-    std::cout << "service: " << (void *) service << std::endl;
 }
 
 void Alarm::on_expired() {
