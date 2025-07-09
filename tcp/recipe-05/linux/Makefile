@@ -10,7 +10,7 @@ all: $(PROGRAMS)
 $(PROGRAMS): %: %.o
 	$(CC) -o $@ $^
 
-%.o: %.cpp
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean
