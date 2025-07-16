@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
         const int MESSAGE_SIZE = 30;
         char message[MESSAGE_SIZE];
-		int str_len = sock.read_some(asio::buffer(message, MESSAGE_SIZE));
+        int str_len = sock.read_some(asio::buffer(message, MESSAGE_SIZE));
         std::cout << "Message from server: " << std::string_view(message, str_len) << std::endl;
     }
     // Overloads of asio::ip::address::from_string() and 
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     // exceptions in case of error condition.
     catch (std::system_error &e) {
         std::cout << "Error occured! Error code = " << e.code()
-            << ". Message: " << e.what();
+            << ". Message: " << e.what() << std::endl;
 
         return e.code().value();
     }

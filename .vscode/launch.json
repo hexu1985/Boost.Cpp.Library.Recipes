@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/home/hexu/git/Boost.Cpp.Library.Recipes/timer/recipe-01/boost/build/timer_once1",
+            "program": "/home/hexu/git/Boost.Cpp.Library.Recipes/timer/recipe-01/my_impl/build/timer_once1",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

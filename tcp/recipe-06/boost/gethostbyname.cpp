@@ -9,44 +9,44 @@ using namespace boost;
 
 int main(int argc, char* argv[])
 {
-	if(argc!=2) {
-		printf("Usage : %s <addr>\n", argv[0]);
-		exit(1);
-	}
+    if(argc!=2) {
+        printf("Usage : %s <addr>\n", argv[0]);
+        exit(1);
+    }
 
-	// Step 1. Assume that the client application has already obtained
-	// the DNS name and protocol port number and represented them as 
-	// strings.
-	//std::string host = "samplehost.com";
-	//std::string port_num = "3333";
-	std::string host = argv[1];
-	std::string port_num = "";
+    // Step 1. Assume that the client application has already obtained
+    // the DNS name and protocol port number and represented them as 
+    // strings.
+    //std::string host = "samplehost.com";
+    //std::string port_num = "3333";
+    std::string host = argv[1];
+    std::string port_num = "";
 
-	// Step 2.
-	asio::io_context io;
+    // Step 2.
+    asio::io_context io;
 
-	// Step 3. Creating a resolver.
-	asio::ip::tcp::resolver resolver(io);
+    // Step 3. Creating a resolver.
+    asio::ip::tcp::resolver resolver(io);
 
-	// Used to store information about error that happens
-	// during the resolution process.
-	system::error_code ec;
+    // Used to store information about error that happens
+    // during the resolution process.
+    system::error_code ec;
 
-	// Step 4.
+    // Step 4.
     auto results = resolver.resolve(host, port_num, ec);
 
-	// Handling errors if any.
-	if (ec.value() != 0) {
-		// Failed to resolve the DNS name. Breaking execution.
-		std::cout << "Failed to resolve a DNS name. Error code = "
-			<< ec.value() << ". Message = " << ec.message();
+    // Handling errors if any.
+    if (ec.value() != 0) {
+        // Failed to resolve the DNS name. Breaking execution.
+        std::cout << "Failed to resolve a DNS name. Error code = "
+            << ec.value() << ". Message = " << ec.message();
 
-		return ec.value();
-	}
+        return ec.value();
+    }
 
     bool once = false;
     for (const auto& entry : results) {
-		// Here we can access the endpoint like this.
+        // Here we can access the endpoint like this.
         if (!once) {
             std::cout << "  Host name: " << entry.host_name() << "\n";
             std::cout << "  -------------------------\n";
@@ -65,5 +65,5 @@ int main(int argc, char* argv[])
         std::cout << "  -------------------------\n";
     }
 
-	return 0;
+    return 0;
 }

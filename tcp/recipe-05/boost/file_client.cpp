@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
             return -1;
         }
 
-        const int BUF_SIZE = 30;
+        const int BUF_SIZE = 1024;
         char buf[BUF_SIZE];
         int read_cnt;
         system::error_code ec;
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
     // exceptions in case of error condition.
     catch (system::system_error &e) {
         std::cout << "Error occured! Error code = " << e.code()
-            << ". Message: " << e.what();
+            << ". Message: " << e.what() << std::endl;
 
         return e.code().value();
     }
