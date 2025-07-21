@@ -1,6 +1,6 @@
 ### 共享内存实现生产者消费者模式
 
-- [POSIX实现](posix)
+- [POSIX实现](linux)
 - [Boost实现](boost)
 
 ### 参考资料

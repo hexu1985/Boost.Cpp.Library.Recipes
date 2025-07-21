@@ -1,6 +1,6 @@
 ### 共享内存对象API
 
-- [POSIX API示例](posix)
+- [POSIX API示例](linux)
 - [Boost API示例](boost)
 
 ### 参考资料
