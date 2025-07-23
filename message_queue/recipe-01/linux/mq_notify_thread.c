@@ -51,6 +51,8 @@ threadFunc(union sigval sv)
 
     notifySetup(mqdp);
 
+    printf("In threadFunc, Thread ID: %lu\n", (unsigned long)pthread_self());
+
     while ((numRead = mq_receive(*mqdp, buffer, attr.mq_msgsize, NULL)) >= 0)
         printf("Read %ld bytes\n", (long) numRead);
 
