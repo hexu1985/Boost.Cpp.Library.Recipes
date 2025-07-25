@@ -4,8 +4,6 @@
 
    Usage as shown in usageError().
 */
-#include <stdio.h>
-#include <stdlib.h>
 #include <iostream>
 #include <string>
 #include <boost/interprocess/shared_memory_object.hpp>

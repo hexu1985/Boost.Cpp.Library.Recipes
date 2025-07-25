@@ -9,70 +9,77 @@
 */
 #include <boost/interprocess/sync/named_semaphore.hpp>
 #include <boost/interprocess/permissions.hpp>
-#include <unistd.h>
 #include <iostream>
 #include <string>
 #include <memory>
-#include <stdio.h>
+
+#include "cxxopts.hpp"
 
 using namespace boost::interprocess;
 
 static void
-usageError(const char *progName)
+printUsage(const char *progName)
 {
-    fprintf(stderr, "Usage: %s [-cx] name [octal-perms [value]]\n", progName);
-    fprintf(stderr, "    -c   Create semaphore (O_CREAT)\n");
-    fprintf(stderr, "    -x   Create exclusively (O_EXCL)\n");
-    exit(EXIT_FAILURE);
+    std::cerr << "Usage: " << progName << "[-cx] name [octal-perms [value]]\n"
+              <<  "    -c   Create semaphore (O_CREAT)\n"
+              <<  "    -x   Create exclusively (O_EXCL)\n";
 }
 
 int
 main(int argc, char *argv[])
 {
-    const int open_bit = 1;
-    const int create_bit = 10;
-    const int exist_bit = 100;
+    cxxopts::Options options("pshm_create", "create shared memory");
 
-    int flags = open_bit;
-    int opt;
-    while ((opt = getopt(argc, argv, "cx")) != -1) {
-        switch (opt) {
-        case 'c':   flags += create_bit;        break;
-        case 'x':   flags += exist_bit;         break;
-        default:    usageError(argv[0]);
+    options.add_options()
+        ("h,help", "Print help")
+        ("c", "Create semaphore (O_CREAT)", cxxopts::value<bool>()->default_value("false"))
+        ("x", "Create exclusively (O_EXCL)", cxxopts::value<bool>()->default_value("false"))
+        ("name", "shm-name", cxxopts::value<std::string>())
+        ("perms", "octal-perms", cxxopts::value<std::string>())
+        ("value", "value", cxxopts::value<unsigned int>());
+
+    options.parse_positional({"name", "perms", "value"});
+
+    try {
+        auto result = options.parse(argc, argv);
+
+        if (result.count("help")) {
+            printUsage(argv[0]);
+            return 0;
         }
-    }
 
-    if (optind >= argc)
-        usageError(argv[0]);
+        if (!result.count("name")) {
+            printUsage(argv[0]);
+            return 1;
+        }
 
-    /* Default permissions are rw-------; default semaphore initialization
-       value is 0 */
+        std::string name = result["name"].as<std::string>();
+        unsigned int value = 0;
+        if (result.count("value")) {
+            value = result["value"].as<unsigned int>();
+        }
 
-    permissions perms;
-    if (argc <= optind + 1) {
-        perms.set_default();
-    } else {
-        perms.set_permissions(std::stoul(argv[optind + 1], nullptr, 8));
-    }
+        permissions perms;
+        if (result.count("perms")) {
+            perms.set_permissions(
+                    std::stoul(result["perms"].as<std::string>(), nullptr, 8));
+        } else {
+            perms.set_default();
+        }
 
-    unsigned int value; 
-    if (argc <= optind + 2) {
-        value = 0;
-    } else {
-        value = std::stoul(argv[optind + 2]);
-    }
-
-    std::unique_ptr<named_semaphore> sem;
-    if (flags == open_bit) {
-        sem = std::make_unique<named_semaphore>(open_only, argv[optind]);
-    } else if (flags == open_bit + create_bit) {
-        sem = std::make_unique<named_semaphore>(open_or_create, argv[optind], value, perms);
-    } else if (flags == open_bit + create_bit + exist_bit) {
-        sem = std::make_unique<named_semaphore>(create_only, argv[optind], value, perms);
-    } else {
-        std::cerr << "invalid flags: " << flags << '\n';
-        exit(1);
+        std::unique_ptr<named_semaphore> sem;
+        if (result["c"].as<bool>() && result["x"].as<bool>()) {
+            sem = std::make_unique<named_semaphore>(create_only, name.c_str(), value, perms);
+        } else if (result["c"].as<bool>()) {
+            sem = std::make_unique<named_semaphore>(open_or_create, name.c_str(), value, perms);
+        } else {
+            sem = std::make_unique<named_semaphore>(open_only, name.c_str());
+        }
+    } catch (const cxxopts::exceptions::exception& e) {
+        // 捕获解析错误（如缺少必需参数、类型不匹配）
+        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << options.help() << std::endl;
+        return 1;
     }
 
     return 0;
