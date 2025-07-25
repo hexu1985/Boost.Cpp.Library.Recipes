@@ -14,7 +14,7 @@ main(int argc, char *argv[])
 {
     if (argc != 2 || strcmp(argv[1], "--help") == 0) {
         std::cerr << "Usage: " << argv[0] << "shm-name\n";
-        exit(1);
+        return 1;
     }
 
     shared_memory_object::remove(argv[1]);
