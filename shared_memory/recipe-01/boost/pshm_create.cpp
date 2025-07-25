@@ -5,73 +5,88 @@
    Usage as shown in usageError().
 */
 #include <stdio.h>
-#include <unistd.h>
+#include <stdlib.h>
 #include <iostream>
 #include <string>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/permissions.hpp>
 
+#include "cxxopts.hpp"
+
 using namespace boost::interprocess;
 
 static void
-usageError(const char *progName)
+printUsage(const char *progName)
 {
-    fprintf(stderr, "Usage: %s [-cx] shm-name size [octal-perms]\n", progName);
-    fprintf(stderr, "    -c   Create shared memory (O_CREAT)\n");
-    fprintf(stderr, "    -x   Create exclusively (O_EXCL)\n");
-    exit(EXIT_FAILURE);
+    std::cerr << "Usage: " << progName << "[-cx] shm-name size [octal-perms]\n"
+              << "    -c   Create shared memory (O_CREAT)\n"
+              << "    -x   Create exclusively (O_EXCL)\n";
 }
 
 int
 main(int argc, char *argv[])
 {
-    const int open_bit = 1;
-    const int create_bit = 10;
-    const int exist_bit = 100;
+    cxxopts::Options options("pshm_create", "create shared memory");
 
-    int flags = open_bit;
-    int opt;
-    while ((opt = getopt(argc, argv, "cx")) != -1) {
-        switch (opt) {
-        case 'c':   flags += create_bit;        break;
-        case 'x':   flags += exist_bit;         break;
-        default:    usageError(argv[0]);
+    options.add_options()
+        ("h,help", "Print help")
+        ("c", "Create shared memory (O_CREAT)", cxxopts::value<bool>()->default_value("false"))
+        ("x", "Create exclusively (O_EXCL)", cxxopts::value<bool>()->default_value("false"))
+        ("name", "shm-name", cxxopts::value<std::string>())
+        ("size", "size", cxxopts::value<size_t>())
+        ("perms", "octal-perms", cxxopts::value<std::string>());
+
+    options.parse_positional({"name", "size", "perms"});
+
+    try {
+        auto result = options.parse(argc, argv);
+
+        if (result.count("help")) {
+            printUsage(argv[0]);
+            return 0;
         }
+
+        if (!result.count("name") || !result.count("size")) {
+            printUsage(argv[0]);
+            return 1;
+        }
+
+        std::string name = result["name"].as<std::string>();
+        size_t size = result["size"].as<size_t>();
+
+        permissions perms;
+        if (result.count("perms")) {
+            perms.set_permissions(
+                    std::stoul(result["perms"].as<std::string>(), nullptr, 8));
+        } else {
+            perms.set_default();
+        }
+
+        /* Create shared memory object and set its size */
+        shared_memory_object shdmem;
+        if (result["c"].as<bool>() && result["x"].as<bool>()) {
+            shdmem = shared_memory_object{create_only, name.c_str(), read_write, perms};
+        } else if (result["c"].as<bool>()) {
+            shdmem = shared_memory_object{open_or_create, name.c_str(), read_write, perms};
+        } else {
+            shdmem = shared_memory_object{open_only, name.c_str(), read_write};
+        }
+
+        shdmem.truncate(size);
+
+        /* Map shared memory object */
+
+        mapped_region region{shdmem, read_only};
+        const uint8_t* addr = static_cast<const uint8_t*>(region.get_address());
+        (void) addr;
+
+    } catch (const cxxopts::exceptions::exception& e) {
+        // 捕获解析错误（如缺少必需参数、类型不匹配）
+        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << options.help() << std::endl;
+        return 1;
     }
-
-    if (optind + 1 >= argc)
-        usageError(argv[0]);
-
-    /* Create shared memory object and set its size */
-
-    size_t size = std::stol(argv[optind + 1]);
-    permissions perms;
-    if (argc <= optind + 2) {
-        perms.set_default();
-    } else {
-        perms.set_permissions(std::stoul(argv[optind + 2], nullptr, 8));
-    }
-
-    shared_memory_object shdmem;
-    if (flags == open_bit) {
-        shdmem = shared_memory_object{open_only, argv[optind], read_write};
-    } else if (flags == open_bit + create_bit) {
-        shdmem = shared_memory_object{open_or_create, argv[optind], read_write, perms};
-    } else if (flags == open_bit + create_bit + exist_bit) {
-        shdmem = shared_memory_object{create_only, argv[optind], read_write, perms};
-    } else {
-        std::cerr << "invalid flags: " << flags << '\n';
-        exit(1);
-    }
-
-    shdmem.truncate(size);
-
-    /* Map shared memory object */
-
-    mapped_region region{shdmem, read_only};
-    const uint8_t* addr = static_cast<const uint8_t*>(region.get_address());
-    (void) addr;
 
     return 0;
 }
