@@ -12,8 +12,6 @@
 
 void read_childproc(int sig);
 
-void signal_handler(asio::signal_set& signals, const std::error_code& ec, int signo); 
-
 int main(int argc, char* argv[])
 {
     if(argc!=2){
@@ -117,20 +115,5 @@ void read_childproc(int sig)
     int status;
     pid=waitpid(-1, &status, WNOHANG);
     printf("removed proc id: %d \n", pid);
-}
-
-void signal_handler(asio::signal_set& signals, const std::error_code& ec, int signo) {
-    if (ec) {
-        std::cout << "in signal_handler: " << ec.message() << std::endl;
-        return;
-    }
-
-    if (signo == SIGCHLD) {
-        read_childproc(signo);
-    }
-
-    signals.async_wait([&signals](const std::error_code& ec, int signo) {
-            signal_handler(signals, ec, signo);
-            });
 }
 

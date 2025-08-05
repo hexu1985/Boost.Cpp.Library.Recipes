@@ -5,16 +5,20 @@ cd $(dirname ${BASH_SOURCE[0]})
 ./echo_mpserv 9999 &
 SERVER_PID=$!
 
-for i in $(seq 1 3)
+PIDARRAY=()
+
+for i in $(seq 1 5)
 do
-    sleep 1
-    ./echo_client 127.0.0.1 9999 <<EOF
+    ./echo_client 127.0.0.1 9999 <<EOF &
 abc
 123
 456
 Q
 EOF
+PIDARRAY+=("$!")
 done
+
+wait ${PIDARRAY[@]}
 
 kill -9 ${SERVER_PID}
 
