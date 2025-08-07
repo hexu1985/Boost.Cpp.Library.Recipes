@@ -8,7 +8,14 @@
 
 using namespace boost;
 
-void input_read_callback(asio::system_timer& timer, asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, const boost::system::error_code& ec, std::size_t length) {
+void on_timer_timeout(asio::system_timer& timer, std::chrono::seconds interval, const boost::system::error_code& ec); 
+
+void start_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, 
+        asio::system_timer& timer, std::chrono::seconds interval);
+
+void on_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, 
+        asio::system_timer& timer, std::chrono::seconds interval, 
+        const boost::system::error_code& ec, std::size_t length) {
     if (!ec) {
         timer.cancel();
 
@@ -16,26 +23,37 @@ void input_read_callback(asio::system_timer& timer, asio::posix::stream_descript
         std::cout << "message from console: " << std::string(buf.data(), length);
 
         // 继续读取
-        input.async_read_some(asio::buffer(buf), 
-                [&timer, &input, &buf](const boost::system::error_code& ec, std::size_t length) {
-                    input_read_callback(timer, input, buf, ec, length);
-                });
+        start_read_stdin(input, buf, timer, interval);
     } else if (ec != boost::asio::error::operation_aborted) {
         std::cerr << "Read error: " << ec.message() << std::endl;
     }
 }
 
-void input_timeout_callback(asio::system_timer& timer, const boost::system::error_code& ec) {
+void start_timer(asio::system_timer& timer, std::chrono::seconds interval) {
+    timer.expires_after(interval);
+    timer.async_wait([&timer, interval](const boost::system::error_code& ec) {
+                on_timer_timeout(timer, interval, ec);
+            });
+}
+
+void on_timer_timeout(asio::system_timer& timer, std::chrono::seconds interval, const boost::system::error_code& ec) {
     if (!ec) {
         std::cout << "Time-out!" << std::endl;
-    }
-    if (ec == asio::error::operation_aborted) {
+        start_timer(timer, interval);
+    } else if (ec == asio::error::operation_aborted) {
         // cancel
+        return;
+    } else {
+        std::cout << "unexpected" << std::endl;
     }
-    
-    timer.expires_after(std::chrono::seconds(5));
-    timer.async_wait([&timer](const boost::system::error_code& ec) {
-                input_timeout_callback(timer, ec);
+}
+
+void start_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, 
+        asio::system_timer& timer, std::chrono::seconds interval) {
+    start_timer(timer, interval);
+    input.async_read_some(asio::buffer(buf), 
+            [&input, &buf, &timer, interval] (const boost::system::error_code& ec, std::size_t length) {
+                on_read_stdin(input, buf, timer, interval, ec, length);
             });
 }
 
@@ -43,17 +61,11 @@ int main() {
     asio::io_context io;
 
     asio::posix::stream_descriptor input{io, dup(STDIN_FILENO)};
-    asio::system_timer timer(io, std::chrono::seconds(5));
-    timer.async_wait([&timer](const boost::system::error_code& ec) {
-                input_timeout_callback(timer, ec);
-            });
+    asio::system_timer timer(io);
 
     std::array<char, BUF_SIZE> buf;
 
-    input.async_read_some(asio::buffer(buf),
-            [&timer, &input, &buf](const boost::system::error_code& ec, std::size_t length) {
-                input_read_callback(timer, input, buf, ec, length);
-            });
+    start_read_stdin(input, buf, timer, std::chrono::seconds(5));
 
     io.run();
 
