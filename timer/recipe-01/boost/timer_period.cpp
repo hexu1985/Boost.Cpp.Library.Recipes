@@ -8,24 +8,24 @@
 using namespace boost;
 using namespace std::placeholders;
 
-void periodic_task(asio::system_timer& timer, std::chrono::seconds timeout, const boost::system::error_code& ec);
+void periodic_task(asio::system_timer& timer, std::chrono::seconds interval, const boost::system::error_code& ec);
 
-void start_timer(asio::system_timer& timer, std::chrono::seconds timeout) {
+void start_timer(asio::system_timer& timer, std::chrono::seconds interval) {
     // 再次设置定时器以实现周期性执行
-    timer.expires_after(timeout);
+    timer.expires_after(interval);
     // also can use
     // timer.expires_at(timer.expiry() + std::chrono::seconds(2));
-    timer.async_wait([&timer, timeout](const boost::system::error_code& ec) { periodic_task(timer, timeout, ec); });
+    timer.async_wait([&timer, interval](const boost::system::error_code& ec) { periodic_task(timer, interval, ec); });
 }
 
-void periodic_task(asio::system_timer& timer, std::chrono::seconds timeout, const boost::system::error_code& ec) {
+void periodic_task(asio::system_timer& timer, std::chrono::seconds interval, const boost::system::error_code& ec) {
     if (ec == asio::error::operation_aborted) {
         print_message("任务取消了");
         return;
     }
 
     print_message("周期性任务执行");
-    start_timer(timer, timeout);
+    start_timer(timer, interval);
 }
 
 int main() {
