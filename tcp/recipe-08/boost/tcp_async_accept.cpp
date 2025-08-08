@@ -11,7 +11,7 @@ using namespace boost;
 typedef std::shared_ptr<asio::ip::tcp::socket> socket_ptr;
 typedef std::shared_ptr<asio::ip::tcp::endpoint> endpoint_ptr; 
 
-void on_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor, 
+void handle_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor, 
         socket_ptr sock, endpoint_ptr remote_endpoint,
         const boost::system::error_code& ec);
 
@@ -20,11 +20,11 @@ void start_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor) {
     endpoint_ptr remote_endpoint(new asio::ip::tcp::endpoint);
     acceptor.async_accept(*sock, *remote_endpoint,
             [&io, &acceptor, sock, remote_endpoint](const boost::system::error_code& ec) {
-                on_accept(io, acceptor, sock, remote_endpoint, ec);
+                handle_accept(io, acceptor, sock, remote_endpoint, ec);
             });
 }
 
-void on_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor, 
+void handle_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor, 
         socket_ptr sock, endpoint_ptr remote_endpoint,
         const boost::system::error_code& ec) {
     if ( ec ) {
