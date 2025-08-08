@@ -38,7 +38,7 @@ void handle_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor,
         socket_ptr sock, endpoint_ptr remote_endpoint,
         const boost::system::error_code& ec) {
     if (ec) {
-        std::cout << "handle_accept error!" << std::endl;
+        std::cout << "accept error: " << ec.message() << std::endl;
         return;
     }
 
@@ -58,7 +58,7 @@ void start_session(socket_ptr sock) {
 void on_read(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer, 
         boost::system::error_code ec, size_t bytes) {
     if (ec) {
-        std::cout << "on_read error!" << std::endl;
+        std::cout << "read error: " << ec.message() << std::endl;
         sock->close();
         return;
     }
@@ -73,7 +73,23 @@ void do_read(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer) {
             });
 }
 
+void on_write(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer, 
+        boost::system::error_code ec, size_t bytes) {
+    if (ec) {
+        std::cout << "write error: " << ec.message() << std::endl;
+        sock->close();
+        return;
+    }
+
+    do_read(sock, read_buffer, write_buffer);
+}
+
 void do_write(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer, size_t bytes) {
+    memcpy(write_buffer->data(), read_buffer->data(), bytes);
+    asio::async_write(*sock, asio::buffer(write_buffer->data(), bytes),
+            [sock, read_buffer, write_buffer](boost::system::error_code ec, std::size_t bytes) {
+                on_write(sock, read_buffer, write_buffer, ec, bytes);
+            });
 }
 
 int main(int argc, char* argv[])
