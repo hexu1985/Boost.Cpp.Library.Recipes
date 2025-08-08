@@ -1,23 +1,20 @@
 #include <stdio.h>
 #include <iostream>
 #include <array>
-#include <boost/asio.hpp>
-#include <boost/asio/posix/stream_descriptor.hpp>
+#include <asio.hpp>
 
 #define BUF_SIZE 30
 
-using namespace boost;
-
-void on_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, const system::error_code& ec, std::size_t length);
+void on_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, const std::error_code& ec, std::size_t length);
 
 void start_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf) {
     input.async_read_some(asio::buffer(buf),
-            [&input, &buf](const system::error_code& ec, std::size_t length) {
+            [&input, &buf](const std::error_code& ec, std::size_t length) {
                 on_read_stdin(input, buf, ec, length);
             });
 }
 
-void on_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, const system::error_code& ec, std::size_t length) {
+void on_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, const std::error_code& ec, std::size_t length) {
     if (!ec) {
         // 处理读取到的数据
         std::cout << "message from console: " << std::string(buf.data(), length);

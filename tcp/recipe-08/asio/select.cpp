@@ -1,21 +1,18 @@
 #include <stdio.h>
 #include <iostream>
 #include <array>
-#include <boost/asio.hpp>
-#include <boost/asio/posix/stream_descriptor.hpp>
+#include <asio.hpp>
 
 #define BUF_SIZE 30
 
-using namespace boost;
-
-void on_timer_timeout(asio::system_timer& timer, std::chrono::seconds interval, const system::error_code& ec); 
+void on_timer_timeout(asio::system_timer& timer, std::chrono::seconds interval, const std::error_code& ec); 
 
 void start_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, 
         asio::system_timer& timer, std::chrono::seconds interval);
 
 void on_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, 
         asio::system_timer& timer, std::chrono::seconds interval, 
-        const system::error_code& ec, std::size_t length) {
+        const std::error_code& ec, std::size_t length) {
     if (!ec) {
         timer.cancel();
 
@@ -31,12 +28,12 @@ void on_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_S
 
 void start_timer(asio::system_timer& timer, std::chrono::seconds interval) {
     timer.expires_after(interval);
-    timer.async_wait([&timer, interval](const system::error_code& ec) {
+    timer.async_wait([&timer, interval](const std::error_code& ec) {
                 on_timer_timeout(timer, interval, ec);
             });
 }
 
-void on_timer_timeout(asio::system_timer& timer, std::chrono::seconds interval, const system::error_code& ec) {
+void on_timer_timeout(asio::system_timer& timer, std::chrono::seconds interval, const std::error_code& ec) {
     if (!ec) {
         std::cout << "Time-out!" << std::endl;
         start_timer(timer, interval);
@@ -52,7 +49,7 @@ void start_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BU
         asio::system_timer& timer, std::chrono::seconds interval) {
     start_timer(timer, interval);
     input.async_read_some(asio::buffer(buf), 
-            [&input, &buf, &timer, interval] (const system::error_code& ec, std::size_t length) {
+            [&input, &buf, &timer, interval] (const std::error_code& ec, std::size_t length) {
                 on_read_stdin(input, buf, timer, interval, ec, length);
             });
 }

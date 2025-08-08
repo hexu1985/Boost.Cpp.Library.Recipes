@@ -13,20 +13,20 @@ typedef std::shared_ptr<asio::ip::tcp::endpoint> endpoint_ptr;
 
 void handle_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor, 
         socket_ptr sock, endpoint_ptr remote_endpoint,
-        const boost::system::error_code& ec);
+        const system::error_code& ec);
 
 void start_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor) {
     socket_ptr sock(new asio::ip::tcp::socket(io));
     endpoint_ptr remote_endpoint(new asio::ip::tcp::endpoint);
     acceptor.async_accept(*sock, *remote_endpoint,
-            [&io, &acceptor, sock, remote_endpoint](const boost::system::error_code& ec) {
+            [&io, &acceptor, sock, remote_endpoint](const system::error_code& ec) {
                 handle_accept(io, acceptor, sock, remote_endpoint, ec);
             });
 }
 
 void handle_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor, 
         socket_ptr sock, endpoint_ptr remote_endpoint,
-        const boost::system::error_code& ec) {
+        const system::error_code& ec) {
     if (ec) {
         std::cout << "accept error: " << ec.message() << std::endl;
         return;
