@@ -27,7 +27,8 @@ void start_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor) {
 void handle_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor, 
         socket_ptr sock, endpoint_ptr remote_endpoint,
         const boost::system::error_code& ec) {
-    if ( ec ) {
+    if (ec) {
+        std::cout << "handle_accept error!" << std::endl;
         return;
     }
 

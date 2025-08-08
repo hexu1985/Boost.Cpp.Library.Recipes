@@ -6,14 +6,24 @@
 
 #include <boost/asio.hpp>
 
+#define BUF_SIZE 100
+
 using namespace boost;
 
 typedef std::shared_ptr<asio::ip::tcp::socket> socket_ptr;
 typedef std::shared_ptr<asio::ip::tcp::endpoint> endpoint_ptr; 
+typedef std::array<char, BUF_SIZE> buffer_type;
+typedef std::shared_ptr<buffer_type> buffer_ptr;
 
 void handle_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor, 
         socket_ptr sock, endpoint_ptr remote_endpoint,
         const boost::system::error_code& ec);
+
+void start_session(socket_ptr sock);
+
+void do_read(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer);
+
+void do_write(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer, size_t bytes);
 
 void start_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor) {
     socket_ptr sock(new asio::ip::tcp::socket(io));
@@ -27,13 +37,43 @@ void start_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor) {
 void handle_accept(asio::io_context& io, asio::ip::tcp::acceptor& acceptor, 
         socket_ptr sock, endpoint_ptr remote_endpoint,
         const boost::system::error_code& ec) {
-    if ( ec ) {
+    if (ec) {
+        std::cout << "handle_accept error!" << std::endl;
         return;
     }
 
     std::cout << "Connected client " << *remote_endpoint << std::endl;
 	// 从这里开始, 你可以从socket读取或者写入
+    start_session(sock);
+
 	start_accept(io, acceptor);
+}
+
+void start_session(socket_ptr sock) {
+    buffer_ptr read_buffer(new buffer_type);
+    buffer_ptr write_buffer(new buffer_type);
+    do_read(sock, read_buffer, write_buffer);
+}
+
+void on_read(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer, 
+        boost::system::error_code ec, size_t bytes) {
+    if (ec) {
+        std::cout << "on_read error!" << std::endl;
+        sock->close();
+        return;
+    }
+
+    do_write(sock, read_buffer, write_buffer, bytes);
+}
+
+void do_read(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer) {
+    sock->async_read_some(asio::buffer(*read_buffer),
+            [sock, read_buffer, write_buffer](boost::system::error_code ec, std::size_t bytes) {
+                on_read(sock, read_buffer, write_buffer, ec, bytes);
+            });
+}
+
+void do_write(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer, size_t bytes) {
 }
 
 int main(int argc, char* argv[])
