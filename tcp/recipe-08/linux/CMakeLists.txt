@@ -5,7 +5,7 @@ project(tcp_echo LANGUAGES C)
 message( STATUS "CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}" )
 message( STATUS "PROJECT_SOURCE_DIR = ${PROJECT_SOURCE_DIR}" )
 
-set(TEST_SCRIPTS test.sh)
+set(TEST_SCRIPTS test.sh test2.sh)
 
 foreach(script ${TEST_SCRIPTS})
     add_custom_command(
@@ -21,6 +21,7 @@ endforeach()
 
 add_custom_target(copy_scripts ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test.sh
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test2.sh
 )
 
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
