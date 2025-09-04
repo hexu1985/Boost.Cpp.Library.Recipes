@@ -69,7 +69,7 @@ void on_read(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer,
 
 void do_read(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer) {
     sock->async_read_some(asio::buffer(*read_buffer),
-            [sock, read_buffer, write_buffer](std::error_code ec, std::size_t bytes) {
+            [sock, read_buffer, write_buffer](const std::error_code& ec, std::size_t bytes) {
                 on_read(sock, read_buffer, write_buffer, ec, bytes);
             });
 }

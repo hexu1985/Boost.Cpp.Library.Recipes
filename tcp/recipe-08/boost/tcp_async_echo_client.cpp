@@ -13,20 +13,38 @@ typedef std::shared_ptr<boost::asio::posix::stream_descriptor> descriptor_ptr;
 typedef boost::asio::streambuf buffer_type;
 typedef std::shared_ptr<buffer_type> buffer_ptr;
 
+void do_read_from_console(socket_ptr sock, descriptor_ptr input, buffer_ptr write_buffer);
+void do_read_from_network(socket_ptr sock, descriptor_ptr input, buffer_ptr read_buffer);
+
 void close(socket_ptr sock, descriptor_ptr input) {
     sock->close();
     input->close();
 }
 
+void on_write_to_network(socket_ptr sock, descriptor_ptr input, 
+        buffer_ptr write_buffer,
+        const system::error_code& ec, std::size_t bytes) {
+    // check error
+    if (ec) {
+        std::cout << "write to network error: " << ec.message() << std::endl;
+        close(sock, input);
+        return;
+    }
+
+    do_read_from_console(sock, input, write_buffer);
+}
+
 void do_write_to_network(socket_ptr sock, descriptor_ptr input, 
         buffer_ptr write_buffer) {
     boost::asio::async_write(*sock, *write_buffer,
-            [sock, input, write_buffer](
+            [sock, input, write_buffer](const system::error_code& ec, std::size_t bytes) {
+                on_write_to_network(sock, input, write_buffer, ec, bytes);
+            });
 }
 
 void on_read_from_console(socket_ptr sock, descriptor_ptr input, 
         buffer_ptr write_buffer,
-        const system::error_code& ec, std::size_t length) {
+        const system::error_code& ec, std::size_t bytes) {
     // check error
     if (ec) {
         std::cout << "read from console error: " << ec.message() << std::endl;
@@ -51,10 +69,35 @@ void on_read_from_console(socket_ptr sock, descriptor_ptr input,
     do_write_to_network(sock, input, write_buffer);
 }
 
+void on_read_from_network(socket_ptr sock, descriptor_ptr input, 
+        buffer_ptr read_buffer,
+        const system::error_code& ec, std::size_t bytes) {
+    // check error
+    if (ec) {
+        std::cout << "read from console error: " << ec.message() << std::endl;
+        close(sock, input);
+        return;
+    }
+
+    std::istream is(read_buffer.get());
+    std::string message;
+    std::getline(is, message);
+    std::cout << "Message from server: " << message << std::endl;
+
+    do_read_from_network(sock, input, read_buffer);
+}
+
 void do_read_from_console(socket_ptr sock, descriptor_ptr input, buffer_ptr write_buffer) {
     asio::async_read_until(*input, *write_buffer, '\n',
-            [sock, input, write_buffer](const system::error_code& ec, std::size_t length) {
-                on_read_from_console(sock, input, write_buffer, ec, length);
+            [sock, input, write_buffer](const system::error_code& ec, std::size_t bytes) {
+                on_read_from_console(sock, input, write_buffer, ec, bytes);
+            });
+}
+
+void do_read_from_network(socket_ptr sock, descriptor_ptr input, buffer_ptr read_buffer) {
+    asio::async_read_until(*sock, *read_buffer, '\n',
+            [sock, input, read_buffer](const system::error_code& ec, std::size_t bytes) {
+                on_read_from_network(sock, input, read_buffer, ec, bytes);
             });
 }
 
@@ -62,7 +105,7 @@ void start_session(socket_ptr sock, descriptor_ptr input) {
     buffer_ptr read_buffer(new buffer_type);
     buffer_ptr write_buffer(new buffer_type);
     do_read_from_console(sock, input, write_buffer);
-//    do_read_from_network(sock, input, read_buffer);
+    do_read_from_network(sock, input, read_buffer);
 }
 
 void on_connect(socket_ptr sock, descriptor_ptr input, const system::error_code& ec) {
