@@ -28,7 +28,7 @@ add_custom_target(copy_scripts ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/file_server.cpp
 )
 
-set(ASIO_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/asio/include)
+set(ASIO_INCLUDE $ENV{HOME}/local/asio/include)
 
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 

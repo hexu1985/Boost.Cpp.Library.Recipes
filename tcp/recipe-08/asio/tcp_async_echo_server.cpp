@@ -88,7 +88,7 @@ void on_write(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer,
 void do_write(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer, size_t bytes) {
     memcpy(write_buffer->data(), read_buffer->data(), bytes);
     asio::async_write(*sock, asio::buffer(write_buffer->data(), bytes),
-            [sock, read_buffer, write_buffer](std::error_code ec, std::size_t bytes) {
+            [sock, read_buffer, write_buffer](const std::error_code& ec, std::size_t bytes) {
                 on_write(sock, read_buffer, write_buffer, ec, bytes);
             });
 }

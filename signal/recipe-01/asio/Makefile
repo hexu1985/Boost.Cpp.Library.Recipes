@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -std=c++11 -Iasio/include -DASIO_STANDALONE
+CXXFLAGS = -Wall -std=c++11 -I${HOME}/local/asio/include -DASIO_STANDALONE
 LDFLAGS = 
 LDLIBS = 
 
