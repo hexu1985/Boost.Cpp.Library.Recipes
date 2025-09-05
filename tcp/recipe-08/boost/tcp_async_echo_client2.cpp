@@ -9,12 +9,12 @@
 using namespace boost;
 
 typedef std::shared_ptr<asio::ip::tcp::socket> socket_ptr;
-typedef std::shared_ptr<asio::posix::stream_descriptor> descriptor_ptr;
-typedef asio::streambuf buffer_type;
+typedef std::shared_ptr<boost::asio::posix::stream_descriptor> descriptor_ptr;
+typedef boost::asio::streambuf buffer_type;
 typedef std::shared_ptr<buffer_type> buffer_ptr;
 
-void do_read_from_console(socket_ptr sock, descriptor_ptr input, buffer_ptr write_buffer);
-void do_read_from_network(socket_ptr sock, descriptor_ptr input, buffer_ptr read_buffer);
+void do_read_from_console(socket_ptr sock, descriptor_ptr input, buffer_ptr read_buffer, buffer_ptr write_buffer);
+void do_read_from_network(socket_ptr sock, descriptor_ptr input, buffer_ptr read_buffer, buffer_ptr write_buffer);
 
 void close(socket_ptr sock, descriptor_ptr input) {
     sock->close();
@@ -22,8 +22,9 @@ void close(socket_ptr sock, descriptor_ptr input) {
 }
 
 void on_write_to_network(socket_ptr sock, descriptor_ptr input, 
-        buffer_ptr write_buffer,
+        buffer_ptr read_buffer, buffer_ptr write_buffer,
         const system::error_code& ec, std::size_t bytes) {
+    std::cout << "on_write_to_network" << std::endl;
     // check error
     if (ec) {
         std::cout << "write to network error: " << ec.message() << std::endl;
@@ -31,20 +32,22 @@ void on_write_to_network(socket_ptr sock, descriptor_ptr input,
         return;
     }
 
-    do_read_from_console(sock, input, write_buffer);
+    do_read_from_network(sock, input, read_buffer, write_buffer);
 }
 
 void do_write_to_network(socket_ptr sock, descriptor_ptr input, 
-        buffer_ptr write_buffer) {
-    asio::async_write(*sock, *write_buffer,
-            [sock, input, write_buffer](const system::error_code& ec, std::size_t bytes) {
-                on_write_to_network(sock, input, write_buffer, ec, bytes);
+        buffer_ptr read_buffer, buffer_ptr write_buffer) {
+    std::cout << "do_write_to_network" << std::endl;
+    boost::asio::async_write(*sock, *write_buffer,
+            [sock, input, read_buffer, write_buffer](const system::error_code& ec, std::size_t bytes) {
+                on_write_to_network(sock, input, read_buffer, write_buffer, ec, bytes);
             });
 }
 
 void on_read_from_console(socket_ptr sock, descriptor_ptr input, 
-        buffer_ptr write_buffer,
+        buffer_ptr read_buffer, buffer_ptr write_buffer,
         const system::error_code& ec, std::size_t bytes) {
+    std::cout << "on_read_from_console" << std::endl;
     // check error
     if (ec) {
         std::cout << "read from console error: " << ec.message() << std::endl;
@@ -66,12 +69,13 @@ void on_read_from_console(socket_ptr sock, descriptor_ptr input,
         return;
     }
 
-    do_write_to_network(sock, input, write_buffer);
+    do_write_to_network(sock, input, read_buffer, write_buffer);
 }
 
 void on_read_from_network(socket_ptr sock, descriptor_ptr input, 
-        buffer_ptr read_buffer,
+        buffer_ptr read_buffer, buffer_ptr write_buffer,
         const system::error_code& ec, std::size_t bytes) {
+    std::cout << "on_read_from_network" << std::endl;
     // check error
     if (ec) {
         std::cout << "read from console error: " << ec.message() << std::endl;
@@ -84,28 +88,30 @@ void on_read_from_network(socket_ptr sock, descriptor_ptr input,
     std::getline(is, message);
     std::cout << "Message from server: " << message << std::endl;
 
-    do_read_from_network(sock, input, read_buffer);
+    do_read_from_console(sock, input, read_buffer, write_buffer);
 }
 
-void do_read_from_console(socket_ptr sock, descriptor_ptr input, buffer_ptr write_buffer) {
+void do_read_from_console(socket_ptr sock, descriptor_ptr input, 
+        buffer_ptr read_buffer, buffer_ptr write_buffer) {
+    std::cout << "do_read_from_console" << std::endl;
     asio::async_read_until(*input, *write_buffer, '\n',
-            [sock, input, write_buffer](const system::error_code& ec, std::size_t bytes) {
-                on_read_from_console(sock, input, write_buffer, ec, bytes);
+            [sock, input, read_buffer, write_buffer](const system::error_code& ec, std::size_t bytes) {
+                on_read_from_console(sock, input, read_buffer, write_buffer, ec, bytes);
             });
 }
 
-void do_read_from_network(socket_ptr sock, descriptor_ptr input, buffer_ptr read_buffer) {
+void do_read_from_network(socket_ptr sock, descriptor_ptr input, 
+        buffer_ptr read_buffer, buffer_ptr write_buffer) {
     asio::async_read_until(*sock, *read_buffer, '\n',
-            [sock, input, read_buffer](const system::error_code& ec, std::size_t bytes) {
-                on_read_from_network(sock, input, read_buffer, ec, bytes);
+            [sock, input, read_buffer, write_buffer](const system::error_code& ec, std::size_t bytes) {
+                on_read_from_network(sock, input, read_buffer, write_buffer, ec, bytes);
             });
 }
 
 void start_session(socket_ptr sock, descriptor_ptr input) {
     buffer_ptr read_buffer(new buffer_type);
     buffer_ptr write_buffer(new buffer_type);
-    do_read_from_console(sock, input, write_buffer);
-    do_read_from_network(sock, input, read_buffer);
+    do_read_from_console(sock, input, read_buffer, write_buffer);
 }
 
 void on_connect(socket_ptr sock, descriptor_ptr input, const system::error_code& ec) {
@@ -153,7 +159,7 @@ int main(int argc, char* argv[])
 
         // Step 3. Creating and opening a socket.
         socket_ptr sock{new asio::ip::tcp::socket(io, ep.protocol())};
-        descriptor_ptr input{new asio::posix::stream_descriptor(io, ::dup(STDIN_FILENO))};
+        descriptor_ptr input{new boost::asio::posix::stream_descriptor(io, ::dup(STDIN_FILENO))};
 
         start_connect(ep, sock, input);
 
