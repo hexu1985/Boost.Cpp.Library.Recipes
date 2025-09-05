@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <system_error>
 
 #include <asio.hpp>
 
@@ -56,9 +57,10 @@ void start_session(socket_ptr sock) {
 void on_read(socket_ptr sock, buffer_ptr read_buffer, buffer_ptr write_buffer, 
         std::error_code ec, size_t bytes) {
     if (ec) {
-        std::cout << "read error: " << ec.message() << std::endl;
         if (ec == asio::error::eof || ec == asio::error::connection_reset) {
             std::cout << "client disconnected..." << std::endl;
+        } else {
+            std::cout << "read error: " << ec.message() << std::endl;
         }
         sock->close();
         return;

@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.15 )
 
-project ( tcp_client_server LANGUAGES CXX )
+project ( tcp_echo LANGUAGES CXX )
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message( STATUS "CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}" )
 message( STATUS "PROJECT_SOURCE_DIR = ${PROJECT_SOURCE_DIR}" )
 
-set(TEST_SCRIPTS test.sh)
+set(TEST_SCRIPTS test.sh test2.sh)
 
 foreach(script ${TEST_SCRIPTS})
     add_custom_command(
@@ -25,6 +25,7 @@ endforeach()
 
 add_custom_target(copy_scripts ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test.sh
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test2.sh
 )
 
 set(ASIO_INCLUDE $ENV{HOME}/local/asio/include)
@@ -37,5 +38,4 @@ FOREACH (src_file ${SOURCES})
     target_compile_options(${exe_file} PUBLIC -DASIO_STANDALONE)
     target_include_directories(${exe_file} PUBLIC ${ASIO_INCLUDE})
     add_dependencies(${exe_file} copy_scripts)
-    #    target_link_libraries(${exe_file} Boost::system)
 ENDFOREACH()

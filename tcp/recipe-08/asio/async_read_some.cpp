@@ -1,23 +1,26 @@
 #include <stdio.h>
 #include <iostream>
 #include <array>
-#include <asio.hpp>
+#include <system_error>
 
-#define BUF_SIZE 30
+#include <asio.hpp>
 
 void on_timer_timeout(asio::system_timer& timer, std::chrono::seconds interval, const std::error_code& ec); 
 
-void start_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, 
+void start_read_stdin(asio::posix::stream_descriptor& input, asio::streambuf& buf, 
         asio::system_timer& timer, std::chrono::seconds interval);
 
-void on_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, 
+void on_read_stdin(asio::posix::stream_descriptor& input, asio::streambuf& buf, 
         asio::system_timer& timer, std::chrono::seconds interval, 
         const std::error_code& ec, std::size_t length) {
     if (!ec) {
         timer.cancel();
 
         // 处理读取到的数据
-        std::cout << "message from console: " << std::string(buf.data(), length);
+        std::istream is(&buf);
+        std::string message;
+        std::getline(is, message);
+        std::cout << "message from console: " << message << std::endl;
 
         // 继续读取
         start_read_stdin(input, buf, timer, interval);
@@ -45,10 +48,10 @@ void on_timer_timeout(asio::system_timer& timer, std::chrono::seconds interval, 
     }
 }
 
-void start_read_stdin(asio::posix::stream_descriptor& input, std::array<char, BUF_SIZE>& buf, 
+void start_read_stdin(asio::posix::stream_descriptor& input, asio::streambuf& buf, 
         asio::system_timer& timer, std::chrono::seconds interval) {
     start_timer(timer, interval);
-    input.async_read_some(asio::buffer(buf), 
+    asio::async_read_until(input, buf, '\n',
             [&input, &buf, &timer, interval] (const std::error_code& ec, std::size_t length) {
                 on_read_stdin(input, buf, timer, interval, ec, length);
             });
@@ -60,7 +63,7 @@ int main() {
     asio::posix::stream_descriptor input{io, dup(STDIN_FILENO)};
     asio::system_timer timer(io);
 
-    std::array<char, BUF_SIZE> buf;
+    asio::streambuf buf;
 
     start_read_stdin(input, buf, timer, std::chrono::seconds(5));
 

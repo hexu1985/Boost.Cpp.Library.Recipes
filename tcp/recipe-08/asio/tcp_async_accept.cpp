@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <system_error>
 
 #include <asio.hpp>
 
