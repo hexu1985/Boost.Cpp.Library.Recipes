@@ -2,8 +2,8 @@
 
 cd $(dirname ${BASH_SOURCE[0]})
 
-#./tcp_async_echo_server 9999 &
-#SERVER_PID=$!
+./tcp_async_echo_server 9999 &
+SERVER_PID=$!
 
 PIDARRAY=()
 
@@ -20,6 +20,6 @@ done
 
 wait ${PIDARRAY[@]}
 
-#kill -9 ${SERVER_PID}
+kill -9 ${SERVER_PID}
 
 echo ""

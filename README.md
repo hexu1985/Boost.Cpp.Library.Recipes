@@ -26,7 +26,7 @@
 - [基于TCP的半关闭示例](tcp/recipe-05)
 - [IP地址和域名之间的转换示例](tcp/recipe-06)
 - [TCP echo client server示例（多进程模式）](tcp/recipe-07)
-- [TCP select client server示例](tcp/recipe-08)
+- [TCP echo client server示例（异步模式）](tcp/recipe-08)
 
 ### [UDP](udp)
 - [UDP echo client server示例](udp/recipe-01)
