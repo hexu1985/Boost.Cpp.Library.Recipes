@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "format": "cpp",
-        "cerrno": "cpp"
+        "cerrno": "cpp",
+        "variant": "cpp"
     }
 }
