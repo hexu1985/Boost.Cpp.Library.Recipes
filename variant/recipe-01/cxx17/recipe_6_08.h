@@ -83,6 +83,7 @@ namespace recipe_6_08
          v = 42.0;
          std::visit([](auto&& arg) {std::cout << arg << '\n'; }, v);
 
+//#define CONSTEXPR_IF_AVAILABLE
 #ifdef CONSTEXPR_IF_AVAILABLE
          std::visit([](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
